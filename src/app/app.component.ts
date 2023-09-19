@@ -141,10 +141,35 @@ export class AppComponent {
               x: new Date(e.date).getTime(),
               y: e.temperature
             }))
+          }, {
+            name: 'HeatIndex',
+            data: response.data.data.map(e => ({
+              x: new Date(e.date).getTime(),
+              y: this.calculateHeatIndex(e.temperature, e.humidity)
+            }))
           }]
         }
       }
       this.ref.markForCheck()
     }
+  }
+
+  calculateHeatIndex(temperature: number, relativeHumidity: number): number {
+    const T = (temperature * 1.8) + 32
+    const RH = relativeHumidity
+    let ADJUSTMENT = 0
+    let HI = 0.5 * (T + 61.0 + ((T - 68.0) * 1.2) + (RH * 0.094))
+
+    if ((HI + T) / 2 >= 80) {
+      HI = -42.379 + 2.04901523 * T + 10.14333127 * RH - .22475541 * T * RH - .00683783 * T * T - .05481717 * RH * RH + .00122874 * T * T * RH + .00085282 * T * RH * RH - .00000199 * T * T * RH * RH
+
+      if (T >= 80 && T <= 112 && RH <= 13) {
+        ADJUSTMENT = -1 * (((13 - RH) / 4) * Math.sqrt((17 - Math.abs(T - 95.)) / 17))
+      } else if (T >= 80 && T <= 87 && RH >= 85) {
+        ADJUSTMENT = ((RH - 85) / 10) * ((87 - T) / 5)
+      }
+    }
+
+    return ((HI + ADJUSTMENT - 32) / 1.8)
   }
 }
