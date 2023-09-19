@@ -1,32 +1,150 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core'
+
+import pck from '../../package.json'
+import { DevicesApiService } from './core/api/devices-api.service'
+import { ChartType } from 'ng-apexcharts'
+
+const areaChartType: ChartType = 'area'
+
+const visitorsChart: any = {
+  chart: {
+    type: areaChartType,
+    height: 320,
+    toolbar: {
+      show: false
+    },
+    zoom: {
+      enabled: false
+    },
+    selection: {
+      enabled: false
+    },
+    sparkline: {
+      enabled: true
+    }
+  },
+  grid: {
+    show: true,
+    borderColor: 'var(--border-color)',
+    xaxis: {
+      lines: {
+        show: true
+      }
+    },
+    yaxis: {
+      lines: {
+        show: true
+      }
+    }
+  },
+  legend: {
+    show: false
+  },
+  stroke: {
+    curve: 'smooth',
+    width: 2,
+    lineCap: 'round'
+  },
+  dataLabels: {
+    enabled: false
+  },
+  fill: {
+    gradient: {
+      shade: 'dark',
+      type: 'vertical',
+      shadeIntensity: 0.5,
+      gradientToColors: undefined,
+      inverseColors: true,
+      opacityFrom: 1,
+      opacityTo: 0.5,
+      stops: [0, 35, 100],
+      colorStops: []
+    },
+  },
+  tooltip: {
+    enabled: true,
+    fillSeriesColor: false,
+    theme: 'dark',
+    followCursor: true,
+    onDatasetHover: {
+      highlightDataSeries: false,
+    },
+    y: {
+      formatter: function (value: number) {
+        return '€ ' + value.toFixed(2)
+      }
+    }
+  },
+  xaxis: {
+    type: 'datetime',
+    // floating: true,
+    labels: {
+      show: true,
+      offsetY: -16,
+      //offsetX: -16
+      style: {
+        colors: '#999'
+      }
+    }
+  },
+  yaxis: {
+    show: true,
+    showAlways: true,
+    floating: true,
+    forceNiceScale: true,
+    min: 0,
+    labels: {
+      show: true,
+      // offsetX: -116
+    },
+    axisBorder: {
+      show: true
+    },
+    axisTicks: {
+      show: true
+    }
+  }
+}
 
 @Component({
   selector: 'neo-root',
-  template: `
-    <!--The content below is only a placeholder and can be replaced.-->
-    <div style="text-align:center" class="content">
-      <h1>
-        Welcome to {{title}}!
-      </h1>
-      <span style="display: block">{{ title }} app is running!</span>
-      <img width="300" alt="Angular Logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
-    </div>
-    <h2>Here are some links to help you start: </h2>
-    <ul>
-      <li>
-        <h2><a target="_blank" rel="noopener" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
-      </li>
-      <li>
-        <h2><a target="_blank" rel="noopener" href="https://angular.io/cli">CLI Documentation</a></h2>
-      </li>
-      <li>
-        <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
-      </li>
-    </ul>
-    <router-outlet></router-outlet>
-  `,
-  styles: []
+  templateUrl: './app.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    version: pck.version,
+    class: 'relative flex flex-auto w-full'
+  }
 })
 export class AppComponent {
-  title = 'neo';
+  loading: boolean = true
+  temperature_history: any | undefined
+
+  constructor(
+    private api: DevicesApiService,
+    private ref: ChangeDetectorRef
+  ) { this.load() }
+
+  async load() {
+    // get data for mathijs bedroom themp sensor
+    const response = await this.api.getData<{
+      data: any[]
+    }>('dac7ca013a360dd79f138b620275032c172715a254f0825d30c4cf77f9b38c6d4606b06549fb0a5cff1e522c007cb46e')
+
+    if (response && response.data) {
+      this.loading = false
+      this.temperature_history = {
+        options: {
+          ...visitorsChart,
+          series: [{
+            name: 'Netto-waarde',
+            data: response.data.data.map(e => ({
+              x: new Date(e.date).getTime(),
+              y: e.temperature
+            }))
+          }]
+        }
+      }
+      this.ref.markForCheck()
+    }
+  }
 }

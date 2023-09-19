@@ -1,10 +1,20 @@
-import { ViewEncapsulation } from '@angular/core';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { ViewEncapsulation } from '@angular/core'
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic'
 
-import { AppModule } from './app/app.module';
+import { AppModule } from './app/app.module'
 
 
-platformBrowserDynamic().bootstrapModule(AppModule, {
+function bootstrap() {
+    platformBrowserDynamic().bootstrapModule(AppModule, {
   defaultEncapsulation: ViewEncapsulation.None
 })
-  .catch(err => console.error(err));
+  .catch(err => console.error(err))
+  }
+
+
+ if (document.readyState === 'complete') {
+   bootstrap()
+ } else {
+   document.addEventListener('DOMContentLoaded', bootstrap)
+ }
+ 
