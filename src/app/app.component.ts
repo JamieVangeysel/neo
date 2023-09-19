@@ -71,7 +71,7 @@ const visitorsChart: any = {
     },
     y: {
       formatter: function (value: number) {
-        return '€ ' + value.toFixed(2)
+        return value.toFixed(2) + ' °C'
       }
     }
   },
@@ -136,7 +136,7 @@ export class AppComponent {
         options: {
           ...visitorsChart,
           series: [{
-            name: 'Netto-waarde',
+            name: 'Temperatuur',
             data: response.data.data.map(e => ({
               x: new Date(e.date).getTime(),
               y: e.temperature
