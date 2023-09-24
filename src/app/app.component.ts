@@ -117,7 +117,7 @@ const visitorsChart: any = {
 })
 export class AppComponent {
   loading: boolean = true
-  temperature_history: any | undefined
+  temperature_histories: any[] = []
 
   constructor(
     private api: DevicesApiService,
@@ -126,31 +126,59 @@ export class AppComponent {
 
   async load() {
     // get data for mathijs bedroom themp sensor
-    const response = await this.api.getData<{
-      data: any[]
-    }>('dac7ca013a360dd79f138b620275032c172715a254f0825d30c4cf77f9b38c6d4606b06549fb0a5cff1e522c007cb46e')
+    const response = await this.api.getData<any[]>()
+    // 'dac7ca013a360dd79f138b620275032c172715a254f0825d30c4cf77f9b38c6d4606b06549fb0a5cff1e522c007cb46e'
 
     if (response && response.data) {
       this.loading = false
-      this.temperature_history = {
-        options: {
-          ...visitorsChart,
-          series: [{
-            name: 'Temperatuur',
-            data: response.data.data.map(e => ({
-              x: new Date(e.date).getTime(),
-              y: e.temperature
-            }))
-          }, {
-            name: 'HeatIndex',
-            data: response.data.data.map(e => ({
-              x: new Date(e.date).getTime(),
-              y: this.calculateHeatIndex(e.temperature, e.humidity)
-            }))
-          }]
-        }
+
+      console.log(response)
+
+      let grouped = this.groupBy(response.data, 'device_uuid')
+
+      console.log(grouped)
+
+      for (let key in grouped) {
+        console.log(key, grouped[key][0])
+
+        this.temperature_histories.push({
+          name: grouped[key][0].device_name,
+          current: this.lastTemp(grouped[key]),
+          options: {
+            ...visitorsChart,
+            series: [{
+              name: 'Temperatuur',
+              data: grouped[key].map(e => ({
+                x: new Date(e.date).getTime(),
+                y: e.temperature
+              }))
+            }, {
+              name: 'HeatIndex',
+              data: grouped[key].map(e => ({
+                x: new Date(e.date).getTime(),
+                y: this.calculateHeatIndex(e.temperature, e.humidity)
+              }))
+            }]
+          }
+        })
       }
       this.ref.markForCheck()
+    }
+  }
+
+  groupBy(xs: any[], key: any): { [key: string]: any[] } {
+    return xs.reduce(function (rv, x) {
+      (rv[x[key]] = rv[x[key]] || []).push(x);
+      return rv;
+    }, {})
+  }
+
+  lastTemp(array: any[]) {
+    let last_item = array[array.length - 1]
+    
+    return {
+      temperature: last_item.temperature,
+      heatindex: this.calculateHeatIndex(last_item.temperature, last_item.humidity)
     }
   }
 
