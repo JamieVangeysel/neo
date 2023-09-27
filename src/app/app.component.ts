@@ -21,6 +21,9 @@ const visitorsChart: any = {
     },
     sparkline: {
       enabled: true
+    },
+    animations: {
+      enabled: false
     }
   },
   grid: {
