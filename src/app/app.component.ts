@@ -174,11 +174,11 @@ export class AppComponent {
   }
 
   lastTemp(array: any[]) {
-    let last_item = array[array.length - 1]
-    
+    let first_item = array[0]
+
     return {
-      temperature: last_item.temperature,
-      heatindex: this.calculateHeatIndex(last_item.temperature, last_item.humidity)
+      temperature: first_item.temperature,
+      heatindex: this.calculateHeatIndex(first_item.temperature, first_item.humidity)
     }
   }
 
