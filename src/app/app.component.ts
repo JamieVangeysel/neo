@@ -72,6 +72,9 @@ const visitorsChart: any = {
     onDatasetHover: {
       highlightDataSeries: false,
     },
+    x: {
+      format: 'HH:mm',
+    },
     y: {
       formatter: function (value: number) {
         return value.toFixed(2) + ' °C'
@@ -82,6 +85,8 @@ const visitorsChart: any = {
     type: 'datetime',
     // floating: true,
     labels: {
+      datetimeUTC: false,
+      format: 'd MMM',
       show: true,
       offsetY: -16,
       //offsetX: -16
