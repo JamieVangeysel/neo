@@ -9,7 +9,7 @@ const areaChartType: ChartType = 'area'
 const visitorsChart: any = {
   chart: {
     type: areaChartType,
-    height: 320,
+    height: 480,
     toolbar: {
       show: false
     },
@@ -99,8 +99,10 @@ const visitorsChart: any = {
     show: true,
     showAlways: true,
     floating: true,
-    forceNiceScale: true,
+    // forceNiceScale: true,
     min: 0,
+    max: 35,
+    tickAmount: 7,
     labels: {
       show: true,
       // offsetX: -116
