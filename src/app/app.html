@@ -1,0 +1,54 @@
+<div class="flex flex-col w-full max-w-screen-xl mx-auto p-6 md:p-8">
+  <!-- <blockquote class="p-4 border-l-4 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800">
+    <p class="text-xl italic font-medium leading-relaxed text-gray-900 dark:text-gray-200">
+      Op deze pagina krijg je overzicht van al je uitgaven, inkomens, gemiddeldes, maandelijkse vergelijking,
+      voorspellingen en waarschuwingen indien je over je budget gaat.
+    </p>
+  </blockquote> -->
+  @if (loading) {
+    <div class="flex flex-col item-center justify-center text-center">
+      <div class="mx-auto">
+        <i class="fal fa-fw fa-2x fa-spin fa-circle-notch"></i> Ophalen van temperatuur gegevens...
+      </div>
+    </div>
+  } @else {
+    <div class="flex items-center justify-between w-full">
+      <div>
+        <div class="text-3xl font-semibold tracking-tight leading-8">
+          Neo
+        </div>
+        <div class="font-medium tracking-tight text-secondary">
+          Deze pagina omvat alle beschikbare neo data
+        </div>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full mt-8">
+      <div class="flex flex-col flex-auto bg-gray-800 dark text-white shadow rounded-2xl overflow-hidden
+          dark:shadow-none sm:col-span-2 lg:col-span-3" *ngFor="let temperature_history of temperature_histories">
+        <div class="flex items-center justify-between mt-10 ml-10 mr-6 sm:mr-10">
+          <div class="flex flex-col">
+            <div class="mr-4 text-2xl md:text-3xl font-semibold tracking-tight leading-7">
+              Historiek {{ temperature_history.name }} (live
+              heatindex: {{ temperature_history.current.heatindex | number:'2.2-2' }} °C)
+            </div>
+            <div class="font-medium text-secondary">Temperatuur evolutie de afgelopen 7 dagen in 10 minuut intervallen.
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-col flex-auto h-[480px] mt-6">
+          <apx-chart class="flex-auto w-full h-full" [series]="temperature_history.options.series"
+                     [xaxis]="temperature_history.options.xaxis" [yaxis]="temperature_history.options.yaxis"
+                     [stroke]="temperature_history.options.stroke" [dataLabels]="temperature_history.options.dataLabels"
+                     [colors]="temperature_history.options.colors" [grid]="temperature_history.options.grid"
+                     [legend]="temperature_history.options.legend" [fill]="temperature_history.options.fill"
+                     [tooltip]="temperature_history.options.tooltip" [chart]="temperature_history.options.chart">
+          </apx-chart>
+        </div>
+      </div>
+    </div>
+  }
+  <div class="mt-6 font-medium tracking-tight text-secondary">
+    Gemaakt door <a class="text-blue-400 hover:underline" href="http://jamievangeysel.be" target="_blank"
+                    rel="noopener">Jamie Vangeysel</a>
+  </div>
+</div>

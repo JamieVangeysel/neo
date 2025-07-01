@@ -2,7 +2,7 @@
 ### build ###
 #############
 
-FROM node:18-alpine as build
+FROM node:22-alpine AS build
 # add nodejs, create group node, create user node, create folder to run app in and give exlusive rights to new node user
 RUN apk add --no-cache --update tzdata && mkdir -p /usr/src/app && chown node:node /usr/src/app && rm -vrf /var/cache/apk/*
 # set timezone to local time
@@ -13,7 +13,7 @@ RUN npm set progress=false && npm config set depth 0
 WORKDIR /app
 
 # add `/app/node_modules/.bin` to $PATH
-ENV PATH /app/node_modules/.bin:$PATH
+ENV PATH=/app/node_modules/.bin:$PATH
 
 # install and cache app dependencies
 COPY package.json /app/package.json
@@ -30,14 +30,13 @@ RUN ng build --configuration production --output-path=dist
 ############
 
 # base image
-FROM jamievangeysel/nginx
+FROM node:22-alpine
 
 #remove all content form html
-RUN rm -rf /usr/share/nginx/html/*
+COPY --from=build /app/dist /app/dist
 
-# copy artifact build from the 'build environment'
-COPY --from=build /app/dist /usr/share/nginx/html
-COPY --from=build /app/nginx.conf /etc/nginx/conf.d/default.conf
+WORKDIR /app
+CMD node dist/server/server.mjs
 
 # expose port 80
 EXPOSE 80

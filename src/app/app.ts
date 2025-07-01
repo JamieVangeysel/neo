@@ -62,7 +62,7 @@ const visitorsChart: any = {
       opacityTo: 0.5,
       stops: [0, 35, 100],
       colorStops: []
-    },
+    }
   },
   tooltip: {
     enabled: true,
@@ -70,13 +70,13 @@ const visitorsChart: any = {
     theme: 'dark',
     followCursor: true,
     onDatasetHover: {
-      highlightDataSeries: false,
+      highlightDataSeries: false
     },
     x: {
-      format: 'HH:mm',
+      format: 'HH:mm'
     },
     y: {
-      formatter: function (value: number) {
+      formatter: function(value: number) {
         return value.toFixed(2) + ' °C'
       }
     }
@@ -104,7 +104,7 @@ const visitorsChart: any = {
     max: 35,
     tickAmount: 7,
     labels: {
-      show: true,
+      show: true
       // offsetX: -116
     },
     axisBorder: {
@@ -118,38 +118,41 @@ const visitorsChart: any = {
 
 @Component({
   selector: 'neo-root',
-  templateUrl: './app.component.html',
+  templateUrl: './app.html',
+  standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     version: pck.version,
     class: 'relative flex flex-auto w-full'
   }
 })
-export class AppComponent {
+export class App {
   loading: boolean = true
   temperature_histories: any[] = []
 
   constructor(
     private api: DevicesApiService,
     private ref: ChangeDetectorRef
-  ) { this.load() }
+  ) {
+    this.load()
+  }
 
   async load() {
-    // get data for mathijs bedroom themp sensor
+    // get data for mathijs bedroom temp sensor
     const response = await this.api.getData<any[]>()
     // 'dac7ca013a360dd79f138b620275032c172715a254f0825d30c4cf77f9b38c6d4606b06549fb0a5cff1e522c007cb46e'
 
     if (response && response.data) {
       this.loading = false
 
-      console.log(response)
+      // console.log(response)
 
       let grouped = this.groupBy(response.data, 'device_uuid')
 
-      console.log(grouped)
+      // console.log(grouped)
 
       for (let key in grouped) {
-        console.log(key, grouped[key][0])
+        // console.log(key, grouped[key][0])
 
         this.temperature_histories.push({
           name: grouped[key][0].device_name,
@@ -177,9 +180,9 @@ export class AppComponent {
   }
 
   groupBy(xs: any[], key: any): { [key: string]: any[] } {
-    return xs.reduce(function (rv, x) {
-      (rv[x[key]] = rv[x[key]] || []).push(x);
-      return rv;
+    return xs.reduce(function(rv, x) {
+      (rv[x[key]] = rv[x[key]] || []).push(x)
+      return rv
     }, {})
   }
 

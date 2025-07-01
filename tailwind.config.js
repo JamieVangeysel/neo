@@ -1,10 +1,8 @@
-const colors = require('tailwindcss/colors')
-
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   important: true,
   content: [
-    "./src/**/*.{html,ts}",
+    "./src/**/*.{html,ts}"
   ],
   theme: {
     screens: {
@@ -27,7 +25,7 @@ module.exports = {
       '6xl': '2.5rem',
       '7xl': '3rem',
       '8xl': '4rem',
-      '9xl': '6rem',
+      '9xl': '6rem'
     },
     fontFamily: {
       sans: ['Nunito', 'sans-serif'],
@@ -67,7 +65,7 @@ module.exports = {
         '100': '25rem',
         'nav': '280px'
       }
-    },
+    }
   },
-  plugins: [],
+  plugins: []
 }
