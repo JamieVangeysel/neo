@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core'
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit } from '@angular/core'
 
 import pck from '../../package.json'
 import { DevicesApiService } from './core/api/devices-api.service'
@@ -126,7 +126,7 @@ const visitorsChart: any = {
     class: 'relative flex flex-auto w-full'
   }
 })
-export class App {
+export class App implements OnInit {
   loading: boolean = true
   temperature_histories: any[] = []
 
@@ -134,47 +134,50 @@ export class App {
     private api: DevicesApiService,
     private ref: ChangeDetectorRef
   ) {
-    this.load()
   }
 
+  async ngOnInit() {
+    await this.load()
+  }
+
+
+
   async load() {
-    // get data for mathijs bedroom temp sensor
-    const response = await this.api.getData<any[]>()
-    // 'dac7ca013a360dd79f138b620275032c172715a254f0825d30c4cf77f9b38c6d4606b06549fb0a5cff1e522c007cb46e'
+    try {
+      // get data for mathijs bedroom temp sensor
+      const response = await this.api.getData<any[]>()
+      // 'dac7ca013a360dd79f138b620275032c172715a254f0825d30c4cf77f9b38c6d4606b06549fb0a5cff1e522c007cb46e'
 
-    if (response && response.data) {
-      this.loading = false
+      if (response && response.data) {
+        let grouped = this.groupBy(response.data, 'device_uuid')
 
-      // console.log(response)
-
-      let grouped = this.groupBy(response.data, 'device_uuid')
-
-      // console.log(grouped)
-
-      for (let key in grouped) {
-        // console.log(key, grouped[key][0])
-
-        this.temperature_histories.push({
-          name: grouped[key][0].device_name,
-          current: this.lastTemp(grouped[key]),
-          options: {
-            ...visitorsChart,
-            series: [{
-              name: 'Temperatuur',
-              data: grouped[key].map(e => ({
-                x: new Date(e.date).getTime(),
-                y: e.temperature
-              }))
-            }, {
-              name: 'HeatIndex',
-              data: grouped[key].map(e => ({
-                x: new Date(e.date).getTime(),
-                y: this.calculateHeatIndex(e.temperature, e.humidity)
-              }))
-            }]
-          }
-        })
+        for (let key in grouped) {
+          this.temperature_histories.push({
+            name: grouped[key][0].device_name,
+            current: this.lastTemp(grouped[key]),
+            options: {
+              ...visitorsChart,
+              series: [{
+                name: 'Temperatuur',
+                data: grouped[key].map(e => ({
+                  x: new Date(e.date).getTime(),
+                  y: e.temperature
+                }))
+              }, {
+                name: 'HeatIndex',
+                data: grouped[key].map(e => ({
+                  x: new Date(e.date).getTime(),
+                  y: this.calculateHeatIndex(e.temperature, e.humidity)
+                }))
+              }]
+            }
+          })
+        }
       }
+    } catch (e) {
+      console.error('Error while fetching and manipulating data for graphs!')
+    } finally {
+      this.loading = false
       this.ref.markForCheck()
     }
   }
@@ -191,7 +194,8 @@ export class App {
 
     return {
       temperature: first_item.temperature,
-      heatindex: this.calculateHeatIndex(first_item.temperature, first_item.humidity)
+      heatindex: this.calculateHeatIndex(first_item.temperature, first_item.humidity),
+      humidity: first_item.humidity
     }
   }
 

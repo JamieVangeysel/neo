@@ -1,5 +1,5 @@
 import { NgModule, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core'
-import { BrowserModule, provideClientHydration, withEventReplay } from '@angular/platform-browser'
+import { BrowserModule, provideClientHydration, withIncrementalHydration } from '@angular/platform-browser'
 
 import { AppRoutingModule } from './app-routing-module'
 import { App } from './app'
@@ -18,7 +18,7 @@ import { provideHttpClient } from '@angular/common/http'
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideClientHydration(withEventReplay()),
+    provideClientHydration(withIncrementalHydration()),
     provideHttpClient()
   ],
   bootstrap: [App]
