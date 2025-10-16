@@ -28,7 +28,7 @@
     "@angular/platform-browser": "^20.0.0",
     "@angular/platform-server": "^20.0.0",
     "@angular/router": "^20.0.0",
-    "@angular/ssr": "^20.0.4",
+    "@angular/ssr": "^20.3.6",
     "apexcharts": "^4.7.0",
     "express": "^5.1.0",
     "ng-apexcharts": "^1.16.0",
